@@ -1,21 +1,20 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow import keras
 from PIL import Image
-import matplotlib.pyplot as pyplot
 import streamlit as st
 import os
-import requests
+import gdown
 
-# Download model from Google Drive if not already present
+# Google Drive model file URL
 model_url = "https://drive.google.com/uc?id=1l3vzCgDNfUDRsfzdXoAGceQuNdg1UrWb"
 model_path = "LungCancerPrediction.h5"
 
+# Download model if not already present
 if not os.path.exists(model_path):
-    with open(model_path, "wb") as f:
-        f.write(requests.get(model_url).content)
+    with st.spinner("Downloading model..."):
+        gdown.download(model_url, model_path, quiet=False)
 
-# Load Model
+# Load the model
 model = tf.keras.models.load_model(model_path)
 
 # App Page Setup
@@ -46,7 +45,7 @@ if uploaded_file is not None:
 
     # Predict
     prediction = model.predict(img_array)[0][0]
-    result = " Low Risk of Lung Cancer" if prediction < 0.5 else " High Risk of Lung Cancer"
+    result = "Low Risk of Lung Cancer" if prediction < 0.5 else "High Risk of Lung Cancer"
 
     # Show result
     st.subheader("Prediction Results:")
